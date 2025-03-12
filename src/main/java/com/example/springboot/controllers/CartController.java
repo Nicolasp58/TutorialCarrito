@@ -1,42 +1,38 @@
 package com.example.springboot.controllers;
 
 import com.example.springboot.models.Product;
+import com.example.springboot.repositories.ProductRepository;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/cart")
 public class CartController {
 
-    // Simula la "base de datos" de productos
-    private final Map<Integer, Product> products;
-
-    public CartController() {
-        products = new HashMap<>();
-        products.put(121, new Product( "MacBook Pro", 3000));
-        products.put(122, new Product("iPad", 1000));
-    }
+    @Autowired
+    private ProductRepository productRepository;
 
     @GetMapping
     public String index(HttpSession session, Model model) {
-    
+        // Obtener productos del repositorio
+        List<Product> products = productRepository.findAll();
+        
         // Obtener productos del carrito almacenados en la sesión
-        Map<Integer, Integer> cartProductData = (Map<Integer, Integer>) session.getAttribute("cart_product_data");
-        Map<Integer, Product> cartProducts = new HashMap<>();
+        Map<Long, Integer> cartProductData = (Map<Long, Integer>) session.getAttribute("cart_product_data");
+        Map<Long, Product> cartProducts = new HashMap<>();
 
         if (cartProductData != null) {
-            // Agrega a cartProducts los productos presentes en el carrito
-            for (Integer id : cartProductData.keySet()) {
-                if (products.containsKey(id)) {
-                    cartProducts.put(id, products.get(id));
-                }
+            for (Long id : cartProductData.keySet()) {
+                Optional<Product> product = productRepository.findById(id);
+                product.ifPresent(p -> cartProducts.put(id, p));
             }
         }
 
@@ -47,23 +43,27 @@ public class CartController {
         return "cart/index";
     }
 
-    @GetMapping("/add/{id}")
-    public String add(@PathVariable Integer id, HttpSession session) {
+    @PostMapping("/add/{id}")
+    public String add(@PathVariable Long id, HttpSession session) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isEmpty()) {
+            return "redirect:/cart";
+        }
 
         // Recuperar el carrito de la sesión o crear uno nuevo si es nulo
-        Map<Integer, Integer> cartProductData = (Map<Integer, Integer>) session.getAttribute("cart_product_data");
+        Map<Long, Integer> cartProductData = (Map<Long, Integer>) session.getAttribute("cart_product_data");
         if (cartProductData == null) {
             cartProductData = new HashMap<>();
         }
-        // Agrega el producto al carrito (aquí se usa el id como clave y valor)
-        cartProductData.put(id, id);
+
+        // Agregar producto al carrito (contador de cantidad)
+        cartProductData.put(id, cartProductData.getOrDefault(id, 0) + 1);
         session.setAttribute("cart_product_data", cartProductData);
         return "redirect:/cart";
     }
 
     @GetMapping("/removeAll")
     public String removeAll(HttpSession session) {
-        // Elimina el atributo del carrito de la sesión
         session.removeAttribute("cart_product_data");
         return "redirect:/cart";
     }

@@ -15,29 +15,23 @@
 <body>
 <div th:replace="~{fragments/header :: header}"></div>
 
-    <h1 th:text="${subtitle}">Shopping Cart</h1>
+    <div class="alert alert-primary d-inline-block" role="alert" style="margin: 15px;" th:if="${#maps.isEmpty(cartProducts)}">
+        Si desea agregar algún producto en el carrito, debe hacerlo ingresando al producto deseado desde la lista de productos.
+    </div>
 
-    <h2>Available Products</h2>
-    <ul>
-        <li th:each="entry : ${products}">
-            <span>Id: <span th:text="${entry.key}"></span> - </span>
-            <span>Name: <span th:text="${entry.value.name}"></span> - </span>
-            <span>Price: <span th:text="${entry.value.price}"></span> - </span>
-            <a th:href="@{'/cart/add/' + ${entry.key}}">Add to cart</a>
-        </li>
-    </ul>
+    <div style="margin: 15px;">
+        <h2>Products in Cart</h2>
+        <ul>
+            <li th:each="entry : ${cartProducts}">
+                <span>Id: <span th:text="${entry.key}"></span> - </span>
+                <span>Name: <span th:text="${entry.value.name}"></span> - </span>
+                <span>Price: <span th:text="${entry.value.price}"></span></span>
+            </li>
+        </ul>
 
+        <a th:if="${not #maps.isEmpty(cartProducts)}" th:href="@{/cart/removeAll}">Remove all products from cart</a>
+    </div>
+<div th:replace="~{fragments/footer :: footer}"></div> 
 
-    <h2>Products in Cart</h2>
-    <ul>
-        <li th:each="entry : ${cartProducts}">
-            <span>Id: <span th:text="${entry.key}"></span> - </span>
-            <span>Name: <span th:text="${entry.value.name}"></span> - </span>
-            <span>Price: <span th:text="${entry.value.price}"></span></span>
-        </li>
-    </ul>
-
-    <a th:href="@{/cart/removeAll}">Remove all products from cart</a>
-    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
