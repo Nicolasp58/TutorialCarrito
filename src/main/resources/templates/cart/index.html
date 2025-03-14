@@ -28,7 +28,7 @@
                 <span>Price: <span th:text="${entry.value.price}"></span></span>
             </li>
         </ul>
-
+        <p th:if="${#maps.isEmpty(cartProducts)}">Cart is empty.</p>
         <a th:if="${not #maps.isEmpty(cartProducts)}" th:href="@{/cart/removeAll}">Remove all products from cart</a>
     </div>
 <div th:replace="~{fragments/footer :: footer}"></div> 

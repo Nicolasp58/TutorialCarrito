@@ -29,10 +29,20 @@
                         <strong>Price: $</strong> 
                         <span th:text="${product.price}">0</span> 
                     </p> 
-                </div> 
-                <form th:action="@{'/cart/add/' + ${product.id}}" method="post"> 
-                    <button type="submit" class="btn btn-primary">Add to Cart</button> 
-                </form> 
+                    <div class="row" style="margin-top: 30%;">
+                        <div class="col-md-8">
+                            <form th:action="@{'/cart/add/' + ${product.id}}" method="post"> 
+                                <button type="submit" class="btn btn-primary" style="margin-left: 15px;">Add to Cart</button> 
+                            </form> 
+                        </div>
+                        <div class="col">
+                            <form th:action="@{/products/{id}/delete(id=${product.id})}" method="post">
+                                <button type="submit" class="btn btn-primary delete text-white" 
+                                style="margin-left: 10; border-color: #c03409; background-color: #c03409;"><b>Delete Product</b></button>
+                            </form>
+                        </div>
+                    </div> 
+                </div>
             </div> 
         </div>
     </div> 

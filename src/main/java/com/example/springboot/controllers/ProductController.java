@@ -68,4 +68,10 @@ public class ProductController {
         commentRepository.save(comment);
         return "redirect:/products/" + id; 
     }
+
+    @PostMapping("/products/{id}/delete")
+    public String deleteProduct(@PathVariable("id") Long id) {
+        productRepository.deleteById(id);
+        return "redirect:/products";
+    }
 }
